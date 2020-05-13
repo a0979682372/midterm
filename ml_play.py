@@ -8,6 +8,7 @@ import pickle
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
+from os import path
 
 def ml_loop(side: str):
     """
@@ -42,19 +43,26 @@ def ml_loop(side: str):
         scene_info = comm.recv_from_game()
         mid=scene_info["platform_1P"][0]+20
         if c==0:
-            with open("Predict.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'Predict.pickle')
+            with open(filename,"rb") as f:
                 knn=pickle.load(f)
-            with open("T0.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T0.pickle')
+            with open(filename,"rb") as f:
                 knn0=pickle.load(f)
-            with open("T1.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T1.pickle')
+            with open(filename,"rb") as f:
                 knn1=pickle.load(f)
-            with open("T2.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T2.pickle')
+            with open(filename,"rb") as f:
                 knn2=pickle.load(f)
-            with open("T3.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T3.pickle')
+            with open(filename,"rb") as f:
                 knn3=pickle.load(f)
-            with open("T4.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T4.pickle')
+            with open(filename,"rb") as f:
                 knn4=pickle.load(f)
-            with open("T5.pickle","rb") as f:
+            filename = path.join(path.dirname(__file__), 'T5.pickle')
+            with open(filename,"rb") as f:
                 knn5=pickle.load(f)
             box_px=-1
             c=1 
