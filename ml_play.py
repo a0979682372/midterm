@@ -35,6 +35,8 @@ def ml_loop(side: str):
     c=0
     X=[]
     Y=[]
+    old=[]
+    record=[]
     
     dis=100
     # 3. Start an endless loop
@@ -42,6 +44,7 @@ def ml_loop(side: str):
         # 3.1. Receive the scene information sent from the game process
         scene_info = comm.recv_from_game()
         mid=scene_info["platform_1P"][0]+20
+        record.append(scene_info)
         if c==0:
             filename = path.join(path.dirname(__file__), 'Predict.pickle')
             with open(filename,"rb") as f:
@@ -64,6 +67,9 @@ def ml_loop(side: str):
             filename = path.join(path.dirname(__file__), 'T5.pickle')
             with open(filename,"rb") as f:
                 knn5=pickle.load(f)
+            filename = path.join(path.dirname(__file__), 'T6.pickle')
+            with open(filename,"rb") as f:
+                knn6=pickle.load(f)
             box_px=-1
             c=1 
         box_x=scene_info["blocker"][0]
@@ -103,6 +109,8 @@ def ml_loop(side: str):
                 dis=knn4.predict(feature)
             if t==5:
                 dis=knn5.predict(feature1) 
+            if t==6:
+                dis=knn6.predict(feature1)
             if dis<20:
                 dis=20
             if dis>180:
@@ -114,6 +122,18 @@ def ml_loop(side: str):
         if scene_info["status"] != "GAME_ALIVE":
             # Do some updating or resetting stuff
             ball_served = False
+
+            with open("test5.pickle","rb") as f:
+                log=pickle.load(f)
+            for a in log:
+                old.append(a)
+            for a in record:
+                old.append(a)
+            record.clear()
+            print(len(old))
+            with open("test5.pickle","wb") as f:
+                pickle.dump(old,f)
+            old.clear()
 
             # 3.2.1 Inform the game process that
             #       the ml process is ready for the next round
@@ -127,9 +147,9 @@ def ml_loop(side: str):
             comm.send_to_game({"frame": scene_info["frame"], "command": "SERVE_TO_LEFT"})
             ball_served = True
         else:
-            if dis<mid-7:
+            if dis<mid-2:
                 comm.send_to_game({"frame": scene_info["frame"], "command": "MOVE_LEFT"})
-            elif dis>mid+7:
+            elif dis>mid+2:
                 comm.send_to_game({"frame": scene_info["frame"], "command": "MOVE_RIGHT"})
             else :
                 comm.send_to_game({"frame": scene_info["frame"], "command": "NONE"})
